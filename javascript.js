@@ -1,91 +1,73 @@
-var caption, results, giphDiv; 
-var topics = ["engineering", "electrons", "photons", "Ohms+Law", "sensor technology", "engines", "CPU",
-    "transistors", "circuits", "information theory", "E=MC^2", "CPU", "neutrino", "quark"
-];
+var caption, state, data, results, giphDiv;
+var topics = ["engineering", "electrons", "photons", "Ohm's Law", "sensor technology", "engines", "CPU", "transistors", "circuits", "information theory", "E=MC^2", "CPU", "neutrino", "quark"];
+var APIkey = "WrXZbvLFBbcOdunSWBG3md89agFdJE5y";
+var queryURL = ("http://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" + APIkey + "&limit=10");
 
-var APIKey = "WrXZbvLFBbcOdunSWBG3md89agFdJE5y";
-var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" + APIKey + "&limit=10";
 
-// function generateButtons() {
-// $("#engineer-view").empty();
-for (var i = 0; i < topics.length; i++) {
+function generateButtons() {
 
-    var button = $("<button>");
-    button.addClass("button");
-    button.attr("data-name", topics[i]);
-    button.text(topics[i]);
-    $("#engineer-view").append(button);
+    $("#engineer-view").empty();
 
-}
+    for (var i = 0; i < topics.length; i++) {
+        var button = $("<button>");
 
-$("button").on("click", function(event) {
-    event.preventDefault();
+        button.addClass("btn");
+        button.css("margin", "3px");
+        button.attr("data-name", topics[i]);
+        button.text(topics[i]);
+        $("#engineer-view").append(button).prepend($("form"));
+    }
 
-    $.ajax({
-        url: queryURL,
-        method: 'GET'
-    }).done(function(response) {
+    $(".btn").on("click", function(event) {
+        event.preventDefault();
 
-        var results = response.data;
-        // var engineeringTerms = $(this).attr("data-name"); 
+        $.ajax({
+            url: queryURL,
+            method: 'GET'
+        }).done(function(response) {
 
-        // function generateDivs() {
-        for (var i = 0; i < results.length; i++) {
-            var giphDiv = $("<div>");
+        var result = response.data; 
 
-            var caption = results.caption;
-            var r = $("<p>").text("Caption: " + caption);
-            giphDiv.append(r);
+        for (var i = 0; i < result.length; i++) {
+        var imageUrl = result[i].images;
+        var img = $("<img>");
+        img.attr("src", imageUrl);
+        img.addClass("gif");
+        img.attr("data-still", result[i].images.fixed_height_still.url);
+        img.attr("data-animate", result[i].images.fixed_height.url);
+        img.attr("data-state", "still");
 
-            var imgURL = response.images;
-            var img = $("<img>");
-            img.attr("src", results[i].images.fixed_height_still.url);
-            giphDiv.append(img);
+        var caption = result[i].caption;
+        var c = $("<p>").text("Caption: " + caption);
+        img.append(c);
 
-            $("#engineer-view").prepend(giphDiv);
-        }
+        $("#engineer-view").append(img); // APPENDS buttons at TOP in engineering view DIV
+            }
+        });
     });
-});
 
+    $("img").on("click", function() {
 
-$("img").on("click", function() {
-    // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
-    var state = $(this).attr("data-state");
+      var state = $(this).attr("data-state");
 
-    // If the clicked image's state is still, update its src attribute to what its data-animate value is.
-    // Then, set the image's data-state to animate
-    // Else set src to the data-still value
-    if (state === "still") {
+      if (state === "still") {
         $(this).attr("src", $(this).attr("data-animate"));
         $(this).attr("data-state", "animate");
-    } else {
+      } else {
         $(this).attr("src", $(this).attr("data-still"));
         $(this).attr("data-state", "still");
-    }
-});
+      }
+    });
 
-/*      var results = response.data;
-        var still = $(this).attr("src", results[i].images.fixed_height_still.url);
-        var animate = $(this).attr("src", results[i].images.fixed_height.url);
+    $("#user-submit").on("click", function(event) {
+        event.preventDefault();
 
-        if (still) {
-          $(this).attr("src", $(this).attr("src", animate));
-        } else {
-          $(this).attr("src", $(this).attr("src", still));
-        }
-});
+        var userInput = $("#engineering-term").val().trim();
+        topics.push(userInput);
+        generateButtons();
 
-  */
-//. generateDivs();
+    });
+}
+$(document).on("click");
 
-/*$("#userinput-submit").on("click", function(event) {
-  event.preventDefault();
-
-  var userInput = $("#engineering-term").val().trim();
-  topics.push(userInput);
-
-  generateButtons();*/
-/*
-      $(document).on("click", "button", engineerGiphDiv);*/
-
-/* generateButtons();*/
+generateButtons();
