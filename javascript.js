@@ -1,7 +1,6 @@
 var state, results, imageAnimateUrl, imageStillUrl;
 var topics = ["engineering", "electrons", "photons", "Ohm's Law", "sensor technology", "engines", "CPU", "transistors", "circuits", "information theory", "E=MC^2", "CPU", "neutrino", "quark"];
 var APIkey = "WrXZbvLFBbcOdunSWBG3md89agFdJE5y";
-var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" + APIkey + "&limit=10";
 
 
 // create button function for all topics listed
@@ -21,7 +20,8 @@ var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" 
         }
 
     // create button onclick function() to call API giphy data
-    $(".btn").on("click", function(event) {
+    $(".btn").on("click", function() {
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + $(this).attr('data-name') + "&api_key=" + APIkey + "&limit=10";
 
         $.ajax({
             url: queryURL,
@@ -37,20 +37,22 @@ var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" 
 
                 var giphDiv = $("<div class='giph'>");
 
-                var rating = results[0].rating;
+                var rating = results[i].rating;
                 var r = $("<p>").text("Rating: " + rating);
                 giphDiv.append(r);
 
                 var img = $("<img>");
 
                 // create two var's for animated then still img url's
-                var imgAnimateUrl = results[0].images.fixed_height.url;
-                var imgStillUrl = results[0].images.fixed_height_still.url;
+                var imgStillUrl = results[i].images.fixed_height_still.url;
+                //var imgAnimateUrl = results[0].images.fixed_height.url;
 
                 // create class giph to use later for onclick function()
                 img.addClass("giph");
                 // assign attributes animate and still to img
-                img.attr("src", imgStillUrl, imgAnimateUrl);
+                img.attr("src", imgStillUrl);
+                // if URL string has _s.gif at end remove and add .gif
+                // otherwise 
 
                 giphDiv.append(r);
                 giphDiv.append(img);
@@ -59,17 +61,7 @@ var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" 
         });
 
         // create giph class onclick to still and animate img
-        $(".giph").on("click", function() {
 
-            // set this to current img clicked 
-            var state = $(this);
-
-            if (state === imgStillUrl) {
-                $(this).attr("src", imgAnimateUrl);
-            } else {
-                $(this).attr("src", imgStillUrl);    
-            }
-        });
               
         // create button function for user submit 
         $("#user-submit").on("click", function(event) {
@@ -81,6 +73,23 @@ var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" 
 
         });
     });
+
+    $("#engineering-giphs").on("click", '.giph', function() {
+
+            // set this to current img clicked 
+            var curURL = $(this).attr("src");
+            var newURL = "";
+
+            if (curURL.indexOf("_s.gif") !== -1) {
+                newURL = curURL.replace("_s.gif", ".gif");
+            } else {
+               newURL = curURL.replace(".gif", "_s.gif");
+            }
+
+            $(this).attr("src", newURL);
+            console.log(newURL);
+
+        });
 }
 
 $(document).on("click");
