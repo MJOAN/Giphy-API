@@ -1,75 +1,110 @@
-var caption, img, state, data, results;
+var state, results, imageAnimateUrl, imageStillUrl;
 var topics = ["engineering", "electrons", "photons", "Ohm's Law", "sensor technology", "engines", "CPU", "transistors", "circuits", "information theory", "E=MC^2", "CPU", "neutrino", "quark"];
 var APIkey = "WrXZbvLFBbcOdunSWBG3md89agFdJE5y";
-var queryURL = ("http://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" + APIkey + "&limit=10");
+var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=" + APIkey + "&limit=10";
 
 
-function generateButtons() {
+// create button function for all topics listed
+    function generateButtons() {
+        $("#engineering-view").empty();
 
-    $("#engineering-view").empty();
+        for (var i = 0; i < topics.length; i++) {
 
-    for (var i = 0; i < topics.length; i++) {
+            var button = $("<button>");
 
-        var button = $("<button>");
+            button.addClass("btn");
+            button.css("margin", "3px");
+            button.attr("data-name", topics[i]);
+            button.text(topics[i]);
 
-        button.addClass("btn");
-        button.css("margin", "3px");
-        button.attr("data-name", topics[i]);
-        button.text(topics[i]);
+            $("#engineering-view").append(button);
+        }
 
-        $("#engineering-view").append(button);
-    }
-}
-
-    $("button").on("click", function(event) {
-        event.preventDefault();
+    // create button onclick function() to call API giphy data
+    $(".btn").on("click", function(event) {
 
         $.ajax({
             url: queryURL,
             method: 'GET'
-        }).done(function(data) {
-            console.log(data);
+        }).done(function(response) {
+            console.log(response);
 
-            for (var i = 0; i < data[i].length; i++) {
-        
-                    var gifDiv = $("<div class='gif'>");
+            // create var for API response data
+            var results = response.data;
 
-                    var rating = data[i].rating;
-                    var r = $("<p>").text("Rating: " + rating);
-                    gifDiv.append(r);
+            // loop through API giphy results assigning data to each img and div
+            for (var i = 0; i < results.length; i++) {
 
-                    var img = $("<img>");
+                var giphDiv = $("<div class='giph'>");
 
-                    img.attr("src", data[i].images.fixed_height_still.url);
-                    img.attr(data[i].images.fixed_height.url);
-                    //img.attr(data[i].type);
-                    img.attr("data-state");
+                var rating = results[0].rating;
+                var r = $("<p>").text("Rating: " + rating);
+                giphDiv.append(r);
 
-                    gifDiv.append(r);
-                    gifDiv.append(img);
-                    $("#engineering-view").prepend(gifDiv); // APPENDS buttons at TOP in engineering view DIV
-                }
+                var img = $("<img>");
+
+                // create two var's for animated then still img url's
+                var imgAnimateUrl = results[0].images.fixed_height.url;
+                var imgStillUrl = results[0].images.fixed_height_still.url;
+
+                // create class giph to use later for onclick function()
+                img.addClass("giph");
+                // assign attributes animate and still to img
+                img.attr("src", imgStillUrl, imgAnimateUrl);
+
+                giphDiv.append(r);
+                giphDiv.append(img);
+                $("#engineering-giphs").prepend(giphDiv); // APPENDS buttons at TOP in engineering view DIV
+            }
+        });
+
+        // create giph class onclick to still and animate img
+        $(".giph").on("click", function() {
+
+            // set this to current img clicked 
+            var state = $(this);
+
+            if (state === imgStillUrl) {
+                $(this).attr("src", imgAnimateUrl);
+            } else {
+                $(this).attr("src", imgStillUrl);    
+            }
+        });
+              
+        // create button function for user submit 
+        $("#user-submit").on("click", function(event) {
+            event.preventDefault();
+
+            var userInput = $("#engineering-term").val().trim();
+            topics.push(userInput);
+            generateButtons();
+
         });
     });
-
-    $(".gif").on("click", function() {
-
-      var state = $(this).attr("data-state");
-      if (state === "still") {
-        $(this).attr("src", $(this).attr("data-animate"));
-      } else {
-        $(this).attr("src", $(this).attr("data-still"));
-      }
-});
-
-    $("#user-submit").on("click", function(event) {
-        event.preventDefault();
-
-        var userInput = $("#engineering-term").val().trim();
-        topics.push(userInput);
-        generateButtons();
-});
+}
 
 $(document).on("click");
 
 generateButtons();
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
